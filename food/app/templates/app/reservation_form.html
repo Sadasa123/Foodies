@@ -1,0 +1,74 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Reservation Form{% endblock title %}
+
+{% block main-content %}
+<section class="section section-divider" id="reservation" style="background-image: url('/static/app/images/hero-bg.jpg'); color: white; padding-top: 100px; padding-bottom: 50px;">
+    <div class="container">
+        <h2 style="color: white; text-align: left; margin-top: 10px;">Reservation Form</h2>
+
+        <!-- Align the form below the heading -->
+        <form method="post" action="" style="color: white; margin-top: 10px;">
+            {% csrf_token %}
+            
+            <!-- Render form fields -->
+            <div style="margin-bottom: 15px;">
+                {{ form.name.label_tag }}  <!-- Label for the field -->
+                {{ form.name }}  <!-- Rendered form input with widgets -->
+                {{ form.name.errors }}  <!-- Error display -->
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                {{ form.date.label_tag }}
+                {{ form.date }}
+                {{ form.date.errors }}
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                {{ form.time.label_tag }}
+                {{ form.time }}
+                {{ form.time.errors }}
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                {{ form.guests.label_tag }}
+                {{ form.guests }}
+                {{ form.guests.errors }}
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                {{ form.message.label_tag }}
+                {{ form.message }}
+                {{ form.message.errors }}
+            </div>
+
+            <!-- Buttons aligned horizontally -->
+            <center>
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="background-color: #ffcc66; border: none; margin-right: 10px; display: inline-flex; align-items: center; justify-content: center;">Submit</button>
+                    <a href="{% url 'home' %}" class="btn btn-secondary" style="background-color: #ff9966; border: none; display: inline-flex; align-items: center; justify-content: center;">Cancel</a>
+                </div>
+            </center>
+            {% if form.non_field_errors %}
+               {% for error in form.non_field_errors %}
+                  <p class="alert alert-danger my-3">{{error}}</p>
+               {% endfor %}
+            {% endif %}
+
+            {% if messages %}
+               {% for msg in messages %}
+                    <div class="alert alert-{{msg.tags}}" role="alert">
+                      {{msg}}
+                    </div>
+               {% endfor %}
+            {% endif %}
+        </form>
+    </div>
+</section>
+{% endblock main-content %}

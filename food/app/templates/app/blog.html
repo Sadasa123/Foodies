@@ -1,0 +1,49 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}blog{% endblock title %}
+{% block main-content %}
+ <!-- - #BLOG -->
+ <style>
+  .card-text.line-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limit text to 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>
+<section class="section section-divider white blog" id="blog"style="background-image: url('/static/app/images/hero-bg.jpg')">
+  <div class="container">
+    <p class="section-subtitle">Latest Blog Posts</p>
+    <h2 class="h2 section-title">This Is All About <span class="span">Foods</span></h2>
+    <p class="section-text" style="color: white;">Food is any substance consumed to provide nutritional support for an organism.</p>
+    <ul class="blog-list">
+      {% for blog in blogs %}
+      <li>
+          <div class="blog-card">
+            <div class="card-banner" style="margin-top: 20px;">
+              <img src="{{ blog.image.url }}" alt="{{ blog.title }} image" style="max-width: 300px;">
+              <div class="badge">{{ blog.title }}</div>
+            </div>
+              <div class="card-content">
+                  <div class="card-meta-wrapper">
+                      <a href="#" class="card-meta-link">
+                          <ion-icon name="calendar-outline"></ion-icon>
+                          <time class="meta-info" datetime="{{ blog.date }}">{{ blog.date|date:"F j, Y" }}</time>
+                      </a>
+                      <a href="#" class="card-meta-link"><ion-icon name="person-outline"></ion-icon><p class="meta-info">{{ blog.name }}</p></a>
+                  </div>
+                  <h3 class="h3"><a href="#" class="card-title">{{ blog.title }}</a></h3>
+                  <p class="card-text line-clamp">{{ blog.message }}</p>
+                  <a href="{% url 'fullblog' %}" class="btn-link"><span>Read More</span><ion-icon name="arrow-forward" aria-hidden="true"></ion-icon></a>
+              </div>
+          </div>
+      </li>
+      {% endfor %}
+    </ul>   
+    <br><br>   
+    <a href="{% url 'create_blog' %}" class="navbar-link"><button class="btn btn-hover">Create New Blog</button></a>
+  </div>
+</section>
+{% endblock main-content %}
+

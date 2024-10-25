@@ -1,0 +1,116 @@
+{% extends 'app/base.html' %} 
+{% load static %} 
+{% block title %}Checkout{% endblock title %} 
+{% block main-content %}
+<section class="section section-divider white blog" id="blog" style="background-image: url('/static/app/images/hero-bg.jpg'); text-align: left; color: white;">
+  <div class="container">
+    {% if messages %} 
+      {% for msg in messages %}
+        <div class="alert alert-danger" role="alert">{{ msg }}</div>
+      {% endfor %} 
+    {% endif %}
+    <div class="row mt-5">
+      <div class="col-sm-6">
+        <h4>Order Summary</h4>
+        <hr>
+        {% for item in cart_items %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-4">
+                <img src="{{ item.product.Image }}" alt="{{ item.product.food_name }}" class="image" style="width: 200px; height: 150px;">
+              </div>
+              <div class="col-lg-8" style="text-align: right;">
+                <h5 style="text-transform: capitalize;">Product: {{ item.product.food_name }}</h5>
+                <p>Price: {{ item.product.price }}</p>
+                <p>Quantity: {{ item.quantity }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        <p class="fw-bold">Total Cost = {{ totalamount }}</p>
+        <small>Terms and Condition:</small><br>
+        <small>1. We accept payments securely through Razorpay, and your financial information is not stored by us.</small><br>
+        <small>2. Shipping times may vary by location. You will receive a tracking number for your order.</small><br>
+        <small>3. Your personal information is handled as described in our Privacy Policy.</small><br>     
+        <small><b>By proceeding with your order, you acknowledge that you have read, understood, and agreed to these terms and conditions.</b></small><br>
+      </div>
+      <div class="col-sm-4 offset-sm-1">
+        <h4>Select Shipping Address</h4>
+        <hr />
+        <form method="post" id="myform">
+          {% csrf_token %} 
+          {% for ad in add %}
+          <div class="card">
+            <div class="card-body">
+              <h5>{{ ad.name }}</h5>
+              <p>Mobile: {{ ad.mobile }}</p>
+              <p>{{ ad.locality }} {{ ad.city }} {{ ad.state }} {{ ad.pincode }}</p>
+            </div>
+          </div>
+          <div class="form-check mt-2 mb-5">
+            <input
+              class="form-check-input"
+              type="radio"
+              name="custid"
+              id="custadd{{ forloop.counter }}"
+              value="{{ ad.id }}">
+            <label class="form-check-label fw-bold" for="custadd{{ forloop.counter }}">Address: {{ forloop.counter }}</label>
+          </div>
+          {% endfor %}
+          
+          <div class="form-check mb-3">
+            <label for="totalamount" class="form-label">Total Amount</label>
+            <input
+              type="number"
+              class="form-control"
+              name="totalamount"
+              value="{{ totalamount }}"
+              readonly />
+          </div>
+          
+          <div class="text-end">
+            <button id="rzp-button1" type="submit" class="btn btn-warning mt-3 px-5 fw-bold">Payment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <br><br>
+</section>
+{% endblock main-content %} 
+
+{% block payment-gateway %}
+<script>
+var options = {
+    "key": "rzp_test_76e7C2M7OrgHKk", // Your Razorpay key ID
+    "amount": "{{ razoramount }}", // Amount in currency subunits (e.g., 50000 = 500.00 INR)
+    "currency": "INR",
+    "name": "Sfit Food Adda",
+    "description": "Purchase Product",
+    "order_id": "{{ order_id }}", // This should be the generated order ID from the backend
+    "handler": function (response) {
+      console.log("Payment Success");
+      var form = document.getElementById("myform");
+      // Redirect to payment done view with required parameters
+      window.location.href = `/paymentdone?order_id=${response.razorpay_order_id}&payment_id=${response.razorpay_payment_id}&razorpay_signature=${response.razorpay_signature}&cust_id=${form.elements["custid"].value}`;
+    },
+    "theme": {
+        "color": "#f0ffff"
+    }
+};
+
+var rzp1 = new Razorpay(options);
+
+rzp1.on('payment.failed', function (response) {
+    alert(response.error.description);
+});
+
+document.getElementById('rzp-button1').onclick = function (e) {
+    console.log("Button clicked, opening Razorpay...");
+    rzp1.open();
+    e.preventDefault(); // Prevent the default form submission
+}
+</script>
+{% endblock payment-gateway %}

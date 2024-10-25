@@ -1,0 +1,44 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Feedback{% endblock title %}
+
+{% block main-content %}
+<section class="section section-divider" id="reservation" style="background-image: url('/static/app/images/hero-bg.jpg'); color: white; padding-top: 100px; padding-bottom: 50px;">
+    <div class="feedback" style="margin-top:10px;">
+        <p style = "text-align:justify; margin-left: 70px; margin-right: 30px; color: white;">Dear Customer,<br>
+            We hope you're enjoying every moment at our canteen. Your satisfaction is our priority, and your feedback helps us improve.</p>
+        
+        <h4 style = "text-align:justify; margin-left: 70px; margin-right: 30px; color: white;">Could you spare a moment to share your thoughts with us? Your insights will aid us in providing even better products and service.</h4>
+        <br> 
+        <div class="container">
+            <form class="" method="post" action="" >
+            {% csrf_token %}
+                <div class="form-group">
+                    <label for="fname">Name: </label>
+                    <input name="name" autofocus type="text" id="fname" class="form-control" placeholder="Enter your Name" required>
+            
+                    <label for="inputemail">Email: </label>
+                    <input name="email" type="text" id="inputemail" class="form-control" placeholder="Enter your Email Address" required>
+        
+                    <label for="comment">Comment: </label>
+                    <textarea rows="8" cols="50"  name="comment" id="fname" class="form-control" placeholder="Write your views....." required></textarea>
+                    <br>
+                    <center><button onclick="myFunction()" type="submit"  class="btn btn-success btn-lg ">Post</button> </center>
+                    <p id="demo"></p>
+                    <script>
+                        function myFunction() {
+                            alert("Thank you for sharing your valuable feedback with us; your input is greatly appreciated!");
+                            document.getElementById("demo").innerHTML = text;
+                        }
+                    </script>
+                    <p style = text-align:center>Thank you for being a part of our Sfit Food Adda community. We look forward to hearing from you.</p>
+                    <div class="text-center text-primary fw-bold">
+                        <small><a href="/">Go to home page</a></small>
+                    </div>
+                <div>
+            </form>
+        </div>
+    </div>
+</section>
+<br>
+{% endblock main-content %}

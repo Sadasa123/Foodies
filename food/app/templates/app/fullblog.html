@@ -1,0 +1,31 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}{{ blog.title }}{% endblock title %}
+
+{% block main-content %}
+<section class="section section-divider white blog" id="blog-detail" style="background-image: url('/static/app/images/hero-bg.jpg')">
+  <div class="container">
+    <p class="section-subtitle">Blog Post Details</p>
+    <h2 class="h2 section-title">{{ blog.title }}</h2>
+    
+    <div class="blog-detail">
+      <img src="{{ blog.image.url }}" alt="{{ blog.title }} image" style="max-width: 600px; margin: 20px 0;">
+      
+      <div class="card-meta-wrapper">
+          <p class="meta-info">
+              <ion-icon name="calendar-outline"></ion-icon> 
+              <time datetime="{{ blog.date }}">{{ blog.date|date:"F j, Y" }}</time>
+          </p>
+          <p class="meta-info">
+              <ion-icon name="person-outline"></ion-icon> 
+              By {{ blog.name }}
+          </p>
+      </div>
+      
+      <p class="blog-message">{{ blog.message }}</p>
+    </div>
+    
+    <a href="{% url 'blog' %}" class="btn-link"><span>Back to Blog List</span><ion-icon name="arrow-back" aria-hidden="true"></ion-icon></a>
+  </div>
+</section>
+{% endblock main-content %}

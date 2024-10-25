@@ -1,0 +1,15 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Reservation Successful{% endblock title %}
+
+{% block main-content %}
+<section class="section section-divider" id="success" style="background-image: url('/static/app/images/hero-bg.jpg'); color: white; padding-top: 100px; padding-bottom: 50px;">
+    <center><div class="container" style="margin-top:100px; height:400px ">
+        <h1>Reservation Successful!</h1>
+        <p>Thank you for your reservation.</p>
+        <a href="{% url 'home' %}" class="btn btn-primary" style="border: none; margin-right: 10px; display: inline-flex; align-items: center; justify-content: center;">Go to Home</a>
+        <a href="{% url 'reservation' %}" class="btn btn-secondary" style="border: none; margin-right: 10px; display: inline-flex; align-items: center; justify-content: center;">Make Another Reservation</a>
+    </div> </center>
+</section>   
+<br></br>
+{% endblock main-content %}
