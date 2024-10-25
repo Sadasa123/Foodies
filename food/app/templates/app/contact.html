@@ -1,0 +1,29 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Contact{% endblock title %}
+
+{% block main-content %}
+<section class="section section-divider" id="contact"style="background-image: url('/static/app/images/hero-bg.jpg')">
+    <div class="container mt-5" style="text-align: center; color: white">
+        <h2>Contact Us</h2>
+        <p class="fs-4">Address: 153 Williamson Plaza, Maggieberg, MT 09514</p>
+        <p class="fs-4">Contact: +1 (062) 109-9222</p>
+        <p class="fs-4">Gmail: Info@YourGmail24.com</p>
+    </div>
+
+    <div class="container mt-3" style="text-align: center; color: white">
+        <h1>Contact</h1>
+        <p style="text-align: justify;">At SFIT Food Adda, we're committed to providing exceptional service and assistance. Whether you have questions about our products, need support, or want to explore partnership opportunities, we're here to help. Feel free to reach out through any of the provided contact methods, and our dedicated team will assist you.</p>
+        <p class="w3-text-blue-grey w3-large"><b>SFIT Food Adda, SFIT campus, Mount Poinsur, S.V.P. Road, Borivali (West), Mumbai 400 103.</b></p>
+        <p>You can also contact us by phone 00553123-2323 or email sfitfoodadda@gmail.com, or you can send us a message here:</p>
+    </div>
+
+    <div class="text-center container mt-3">
+        <a href="{% url 'feedback' %}">
+            <button style="background-color: orange; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; display: inline-block;">
+                Feedback
+            </button>
+        </a>
+    </div>
+</section>
+{% endblock main-content %}

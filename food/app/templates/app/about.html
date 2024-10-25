@@ -1,0 +1,61 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}About{% endblock title %}
+
+{% block main-content %}
+ <!-- 
+        - #ABOUT
+      -->
+
+      <section class="section section-divider gray about" id="about" style="background-image: url('/static/app/images/hero-bg.jpg')">
+        <div class="container">
+
+          <div class="about-banner">
+            <img src="{% static 'app/images/banner/about-banner.png' %}" width="509" height="459" loading="lazy" alt="Burger with Drinks" class="w-100 about-img">
+
+            <img src="{% static 'app/images/sale-shape-red.png' %}" width="216" height="226" alt="get up to 50% off now" class="abs-img scale-up-anim">
+          </div>
+
+          <div class="about-content">
+
+            <h2 class="h2 section-title" style="color: white;">
+              Caferio, Burgers, and Best Pizzas
+              <span class="span" style="color: white;">in Town!</span>
+            </h2>
+
+            <p class="section-text" style="color: white;">
+              The restaurants in Hangzhou also catered to many northern Chinese who had fled south from Kaifeng during the Jurchen invasion of the 1120s, while it is also known that many restaurants were run by families.
+            </p>
+
+            <ul class="about-list">
+
+              <li class="about-item" style="color: white;">
+                <ion-icon name="checkmark-outline"></ion-icon>
+                <span class="span" style="color: white;">Delicious & Healthy Foods</span>
+              </li>
+
+              <li class="about-item" style="color: white;">
+                <ion-icon name="checkmark-outline"></ion-icon>
+                <span class="span" style="color: white;">Spacific Family And Kids Zone</span>
+              </li>
+
+              <li class="about-item" style="color: white;">
+                <ion-icon name="checkmark-outline"></ion-icon>
+                <span class="span" style="color: white;">Music & Other Facilities</span>
+              </li>
+
+              <li class="about-item" style="color: white;">
+                <ion-icon name="checkmark-outline"></ion-icon>
+                <span class="span" style="color: white;">Fastest Food Home Delivery</span>
+              </li>
+
+            </ul>
+
+            <button class="btn btn-hover">Order Now</button>
+
+          </div>
+
+        </div>
+      </section>
+
+{% endblock main-content %}
