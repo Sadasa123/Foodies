@@ -14,14 +14,14 @@
 </style>
 <section class="section section-divider white blog" id="blog"style="background-image: url('/static/app/images/hero-bg.jpg')">
   <div class="container">
-    <p class="section-subtitle">Latest Blog Posts</p>
+    <p class="section-subtitle" style="color: white">Latest Blog Posts</p>
     <h2 class="h2 section-title">This Is All About <span class="span">Foods</span></h2>
     <p class="section-text" style="color: white;">Food is any substance consumed to provide nutritional support for an organism.</p>
     <ul class="blog-list">
       {% for blog in blogs %}
       <li>
           <div class="blog-card">
-            <div class="card-banner" style="margin-top: 20px;">
+            <div class="card-banner">
               <img src="{{ blog.image.url }}" alt="{{ blog.title }} image" style="max-width: 300px;">
               <div class="badge">{{ blog.title }}</div>
             </div>
@@ -35,8 +35,11 @@
                   </div>
                   <h3 class="h3"><a href="#" class="card-title">{{ blog.title }}</a></h3>
                   <p class="card-text line-clamp">{{ blog.message }}</p>
-                  <a href="{% url 'fullblog' %}" class="btn-link"><span>Read More</span><ion-icon name="arrow-forward" aria-hidden="true"></ion-icon></a>
-              </div>
+                  <a href="{% url 'fullblog' blog.slug %}" class="btn-link">
+                    <span>Read More</span>
+                    <ion-icon name="arrow-forward" aria-hidden="true"></ion-icon>
+                  </a>            
+                </div>
           </div>
       </li>
       {% endfor %}

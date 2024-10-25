@@ -4,32 +4,53 @@ from . models import Customer, Blog
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField, PasswordChangeForm, SetPasswordForm, PasswordResetForm
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 
 class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
         fields = ['name', 'email', 'date', 'time', 'guests', 'message']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your Name','style': 'font-size: 18px;' }),
-            'email': forms.EmailInput(attrs={ 'class': 'form-control', 'placeholder': 'Your Email','style': 'font-size: 18px;'}),
-            'date': forms.DateInput(attrs={ 'class': 'form-control',  'type': 'date', 'placeholder': 'Reservation Date'}),
-            'time': forms.TimeInput(attrs={  'class': 'form-control', 'type': 'time', 'placeholder': 'Reservation Time'}),
-            'guests': forms.NumberInput(attrs={'class': 'form-control','placeholder': 'Number of Guests'}),
-            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Any Special Requests', 'rows': 4 }),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your Name','style': 'font-size: 18px; height: 35px;' }),
+            'email': forms.EmailInput(attrs={ 'class': 'form-control', 'placeholder': 'Your Email','style': 'font-size: 18px; height: 35px;'}),
+            'date': forms.DateInput(attrs={ 'class': 'form-control',  'type': 'date', 'placeholder': 'Reservation Date','style': 'font-size: 12px; height: 35px;'}),
+            'time': forms.TimeInput(attrs={  'class': 'form-control', 'type': 'time', 'placeholder': 'Reservation Time','style': 'font-size: 12px; height: 35px;'}),
+            'guests': forms.NumberInput(attrs={'class': 'form-control','placeholder': 'Number of Guests','style': ' height: 35px;'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Any Special Requests', 'rows': 4 ,'style': 'font-size: 12px;'}),
         }
 
 
 class CustomerProfileForm(forms.ModelForm):
+    mobile = forms.CharField(
+        max_length=10,
+        validators=[RegexValidator(regex=r'^\d{0,10}$', message='Mobile number must be 10 digits or less')],
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'style': 'font-size: 18px; height: 35px;',
+            'maxlength': '10'  # Limit input to 10 digits
+        })
+    )
+
+    pincode = forms.CharField(
+        max_length=6,
+        validators=[RegexValidator(regex=r'^\d{6}$', message='Pincode must be exactly 6 digits')],
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'style': 'font-size: 15px; height: 35px;',
+            'maxlength': '6'  # Limit input to 6 digits
+        })
+    )
+    
     class Meta:
         model = Customer
         fields=['name','village','city','mobile','state','pincode']
         widgets={
-            'name':forms.TextInput(attrs={'class':'form-control'}),
-            'village':forms.TextInput(attrs={'class':'form-control'}),
-            'city':forms.TextInput(attrs={'class':'form-control'}),
-            'mobile':forms.NumberInput(attrs={'class':'form-control'}),
-            'state':forms.Select(attrs={'class':'form-control'}),
-            'pincode':forms.NumberInput(attrs={'class':'form-control'}),
+            'name':forms.TextInput(attrs={'class':'form-control','placeholder': 'Your Name','style': 'font-size: 18px; height: 35px;'}),
+            'village':forms.TextInput(attrs={'class':'form-control','style': 'font-size: 18px; height: 35px;'}),
+            'city':forms.TextInput(attrs={'class':'form-control','style': 'font-size: 18px; height: 35px;'}),
+            'mobile':forms.NumberInput(attrs={'class':'form-control','style': 'font-size: 15px; height: 35px;'}),
+            'state':forms.Select(attrs={'class':'form-control','style': 'font-size: 12px; height: 35px;'}),
+            'pincode':forms.NumberInput(attrs={'class':'form-control','style': 'font-size: 15px; height: 35px;'}),
         }
 
 class LoginForm(AuthenticationForm):

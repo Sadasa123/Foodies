@@ -71,4 +71,48 @@
         </form>
     </div>
 </section>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Disable past dates
+        const dateInput = document.querySelector('input[type="date"]');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+
+        // Disable past times based on selected date
+        dateInput.addEventListener('change', function() {
+            const selectedDate = new Date(dateInput.value);
+            const currentTime = new Date();
+            const hours = String(currentTime.getHours()).padStart(2, '0');
+            const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+            const timeInput = document.querySelector('input[type="time"]');
+
+            if (selectedDate.toDateString() === currentTime.toDateString()) {
+                // On the same day, set min time to current time
+                timeInput.setAttribute('min', `${hours}:${minutes}`);
+            } else {
+                // On different days, just clear the min time restriction
+                timeInput.removeAttribute('min');
+            }
+        });
+
+        // Validate form submission
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            const selectedDate = new Date(dateInput.value);
+            const timeValue = timeInput.value;
+
+            // If date and time are selected
+            if (timeValue) {
+                const selectedDateTime = new Date(`${selectedDate.toISOString().split('T')[0]}T${timeValue}`);
+                const currentDateTime = new Date();
+
+                if (selectedDateTime < currentDateTime) {
+                    event.preventDefault(); // Prevent form submission
+                    alert('Invalid input: You cannot select a past time.');
+                }
+            }
+        });
+    });
+</script>
+
 {% endblock main-content %}

@@ -97,11 +97,6 @@ class contactview(View):
 class homeview(View):
     def get(self,request):
         return render(request,"app/home.html")
-
-@method_decorator(login_required,name='dispatch')    
-class fullblogview(View):
-    def get(self,request):
-        return render(request,"app/fullblog.html")
     
 @method_decorator(login_required,name='dispatch')    
 class ProfileView(View):
@@ -497,6 +492,12 @@ def orders(request):
     order_placed=OrderPlaced.objects.filter(user=request.user)
     return render(request, 'app/orders.html',locals())
 
+def delete_order(request, order_id):
+    order = get_object_or_404(OrderPlaced, id=order_id, user=request.user)
+    order.delete()
+    messages.success(request, 'Order deleted successfully.')
+    return redirect('orders') 
+
 @login_required   
 def create_blog(request):
     if request.method == 'POST':
@@ -515,6 +516,10 @@ def blog(request):
     blogs = Blog.objects.all().order_by('-date')   # Get all blog posts
     return render(request, 'app/blog.html', {'blogs':blogs})
 
+@login_required
+def fullblog(request, slug):
+    blog = get_object_or_404(Blog, slug=slug)  # Fetch the specific blog post by slug
+    return render(request, 'app/fullblog.html', {'blog': blog}) 
 
 #base_dir = 'C:\\Users\\SANIYA\\Downloads\\Rospl-Project\\food'
 
@@ -542,7 +547,7 @@ similarity2_path = os.path.join(pickle_dir, 'similarity2.pkl')
 with open(similarity2_path, 'rb') as file:
     similarity2 = pickle.load(file)
 
-@login_required
+
 def menu(request):
     # Retrieve all products from the database
     products = Product.objects.all()
@@ -562,11 +567,11 @@ def menu(request):
     # Render the template with the data
     return render(request, 'app/menu.html', context)
 
-@login_required
+
 def recommended_ui(request):
     return render(request, 'app/recommend.html')
 
-@login_required
+
 def recommend_foods(request):
     if request.method == 'POST':
         # Get the user input from the form
@@ -600,7 +605,7 @@ def recommend_foods(request):
         except Product.DoesNotExist:
             return HttpResponseNotFound("The requested item is currently not available.")
 
-@login_required
+
 def get_same_category_foods(user_input):
     try:
         food_obj = Product.objects.get(food_name=user_input)
@@ -621,7 +626,7 @@ def get_same_category_foods(user_input):
     except Product.DoesNotExist:
         return []
 
-@login_required
+
 def recommend(food):
     try:
         product = Product.objects.get(food_name=food)
@@ -644,7 +649,7 @@ def recommend(food):
     except Product.DoesNotExist:
         return []
 
-@login_required
+
 def same_recommend1(food):
     try:
         product = Product.objects.get(food_name=food)

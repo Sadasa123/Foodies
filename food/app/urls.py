@@ -9,7 +9,7 @@ from django.urls import path
 from . import views
 from django.urls import path
 from . import views
-from .views import feedback, reservation_view, success_view, ManageReservationView,  DeleteReservationView
+from .views import feedback, reservation_view, success_view, ManageReservationView,  DeleteReservationView, delete_order
 from django.contrib.auth import views as auth_view
 from .forms import LoginForm,  MyPasswordResetForm, MyPasswordChangeForm, MySetPasswordForm
 from .views import create_blog
@@ -26,7 +26,7 @@ urlpatterns = [
     path("contact/", views.contactview.as_view(), name="contact"),
     path("shop/", views.shopview.as_view(), name="shop"),
     path('blog/', views.blog, name='blog'),
-    path('fullblog/', views.fullblogview.as_view(), name='fullblog'),
+    path('fullblog/<slug:slug>/', views.fullblog, name='fullblog'),
     path('createblog/', views.create_blog, name='create_blog'),
     path('feedback/', feedback, name='feedback'),
     path('reservation/', views.reservation_view.as_view(), name='reservation'),
@@ -52,6 +52,7 @@ urlpatterns = [
     path('checkout/', views.checkout.as_view(), name="checkout"),
     path('paymentdone/', views.payment_done, name="paymentdone"),
     path('orders/', views.orders, name="orders"),
+    path('orders/delete/<int:order_id>/', delete_order, name='delete_order'),
 
 
      #new urls

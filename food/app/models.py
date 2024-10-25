@@ -5,6 +5,7 @@ import os
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.forms import ValidationError
 from django.utils import timezone
+from django.utils.text import slugify
 
 # Create your models here.
 
@@ -170,9 +171,15 @@ class OrderPlaced(models.Model):
 class Blog(models.Model):
     name = models.CharField(max_length=100)  # User's name
     date = models.DateField(auto_now_add=True)  # Automatically set the date
+    slug = models.SlugField(unique=True, blank=True, null=True)  
     title = models.CharField(max_length=255, default='Sample')
     message = models.TextField()  # Blog message
-    image = models.ImageField(upload_to='blog_images/')  # Image upload field
+    image = models.ImageField(upload_to='blog_images/')
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:  # Generate slug if it doesn't exist
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)  # Image upload field
 
     def __str__(self):
         return self.name

@@ -46,6 +46,12 @@
                                         <div class="progress-bar bg-danger" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 {% endif %}
+                                {% if op.status != 'Packed' %}
+                                    <form action="{% url 'delete_order' op.id %}" method="post" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                {% endif %}
                             </div>
                         </div>
                         {% endfor %}
