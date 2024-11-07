@@ -1,0 +1,29 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Menu{% endblock title %}
+
+{% block main-content %}
+<section class="section section-divider gray about" id="about" style="background-image: url('/static/app/images/hero-bg.jpg')"></section>
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <h1 style="color: #b22222; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: 50px;">Products</h1>
+    </div>
+    
+    {% for name, category, image, price, pk in zipped_data %}
+    <div class="card mx-4 mb-4" style="width: 270px; height: 350px;">
+      <a href="{% url 'product-detail' pk=pk %}" class="card-link" style="text-decoration: none; color: black;">
+        <img class="card-img-top" src="{{ image }}" alt="" style="width: 100%; height: 200px; object-fit: cover;">
+        <div class="card-body">
+          <h3 class="name-style" style="text-transform: capitalize;">{{ name }}</h3>
+          <h5>Rs. {{ price }}</h5>
+          <p class="name-style" style="text-transform: capitalize;">{{ category }}</p>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+  <br></br>
+</section>
+{% endblock main-content %}

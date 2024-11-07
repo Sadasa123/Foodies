@@ -1,0 +1,32 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Create New Blog{% endblock title %}
+
+{% block main-content %}
+<section class="section section-divider gray about" id="blog" style="background-image: url('/static/app/images/hero-bg.jpg');">
+    <h1 style="color: white;">Create New Blog</h1> <!-- Ensures the heading is white -->
+    
+    <style>
+        /* Apply styles to the form fields */
+        input, textarea, select {
+            border: 2px solid white; /* White border */
+            background-color: rgba(255, 255, 255, 0.2); /* Slightly transparent background */
+            color: white; /* Text color inside the fields */
+            padding: 10px; /* Padding for better appearance */
+            border-radius: 5px; /* Rounded corners */
+            width: 100%; /* Full width */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7); /* Light placeholder color */
+        }
+    </style>
+    
+    <form method="POST" enctype="multipart/form-data" style="padding: 20px; border-radius: 5px; color: white;">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;" class="btn btn-hover">Submit</button>
+    </form>
+</section>
+{% endblock main-content %}

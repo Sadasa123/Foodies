@@ -1,0 +1,15 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Payment Failed{% endblock title %}
+
+{% block main-content %}
+<section class="section" id="payment-failed" style="padding-top: 100px; padding-bottom: 50px;">
+  <div class="container">
+    <h3>Payment Failed</h3>
+    <p>{{ error }}</p>
+    <p>Please try again or contact support for assistance.</p>
+    <a href="{% url 'checkout' %}" class="btn btn-warning mt-3">Retry Payment</a>
+  </div>
+</section>
+{% endblock main-content %}
