@@ -9,7 +9,7 @@ from django.urls import path
 from . import views
 from django.urls import path
 from . import views
-from .views import feedback, reservation_view, ManageReservationView,  DeleteReservationView
+from .views import feedback, reservation_view, ManageReservationView,  DeleteReservationView, delete_order
 from django.contrib.auth import views as auth_view
 from .forms import LoginForm,  MyPasswordResetForm, MyPasswordChangeForm, MySetPasswordForm
 from django.conf.urls.static import static
@@ -18,7 +18,8 @@ from django.conf import settings
 
 urlpatterns = [
     path("", views.home),
-    
+    path('product-detail/<int:pk>/',
+         views.ProductDetail.as_view(), name='product-detail'),
     path("about/", views.aboutview.as_view(), name="about"),
     path("home/", views.homeview.as_view(), name="home"),
     path("contact/", views.contactview.as_view(), name="contact"),
@@ -27,13 +28,18 @@ urlpatterns = [
     path('fullblog/<slug:slug>/', views.fullblog, name='fullblog'),
     path('createblog/', views.create_blog, name='create_blog'),
     path('feedback/', feedback, name='feedback'),
-    # Ensure this points to your success view
+    path('add-to-cart/', views.add_to_cart, name="add-to-cart"),
+    path('cart/', views.show_cart, name="showcart"),
     path("wishlist/", views.wishlistview.as_view(), name="wishlist"),
     path('profile/', views.ProfileView.as_view(), name="profile"),
     path('search/', views.search, name="search"),
     path('address/', views.address, name="address"),
     path('updateAddress/<int:pk>',
          views.updateAddress.as_view(), name="updateAddress"),
+    path('pluscart/', views.plus_cart),
+    path('minuscart/', views.minus_cart, name='minus-cart'),
+    path('removecart/', views.remove_cart, name='removecart'),
+
     
     #Reservation
     path('reservation/', views.reservation_view.as_view(), name='reservation'),
@@ -43,11 +49,19 @@ urlpatterns = [
          DeleteReservationView.as_view(), name='delete_reservation'),
 
     #Payment
+    path('checkout/', views.checkout.as_view(), name="checkout"),
+    path('paymentdone/', views.payment_done, name="paymentdone"),
+    path('orders/', views.orders, name="orders"),
+    path('orders/delete/<int:order_id>/', delete_order, name='delete_order'),
+
 
 
 
      #new urls
      path('menu/', views.menu, name='menu'),
+     path('recommend/', views.recommended_ui, name='recommend'),
+     path('recommend_foods/', views.recommend_foods, name='recommend_foods'),
+
 
     #login authentication
     path('registration/', views.CustomerRegistrationView.as_view(),name="customerregistration"),
