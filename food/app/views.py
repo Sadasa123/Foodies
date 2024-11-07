@@ -145,8 +145,6 @@ def feedback(request):
         return redirect("/")
     return render(request, 'app/feedback.html',locals())
 
-
-
 @login_required   
 def create_blog(request):
     if request.method == 'POST':
@@ -169,3 +167,112 @@ def blog(request):
 def fullblog(request, slug):
     blog = get_object_or_404(Blog, slug=slug)  # Fetch the specific blog post by slug
     return render(request, 'app/fullblog.html', {'blog': blog}) 
+
+@method_decorator(login_required,name='dispatch')
+class reservation_view(View):
+    def get(self, request):
+        form = ReservationForm()
+        return render(request, 'app/reservation_form.html', locals())
+
+    def post(self, request):
+        form = ReservationForm(request.POST)
+        if form.is_valid():
+            # Set the user for the reservation
+            reservation = form.save(commit=False)
+            reservation.user = request.user  # assuming the user is logged in
+            reservation.save()
+            messages.success(request, "Congratulations! Table Booked Successfully")
+            return redirect('success')  # Change this to your URL name for managing reservations
+        else:
+            messages.warning(request, "Invalid Input Data")
+        return render(request, 'app/reservation_form.html', {'form': form})
+
+@method_decorator(login_required,name='dispatch')       
+class CustomerRegistrationView(View):
+    def get(self,request):
+        form = CustomerRegistrationForm()
+        return render(request, 'app/customerregistration.html',locals())
+    def post(self,request):
+        form = CustomerRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request,"Congratulations! User Register Successfully")
+        else:
+            messages.warning(request,"Inavalid Input Data")
+        return render(request, 'app/customerregistration.html',locals())
+
+@method_decorator(login_required,name='dispatch')  
+class ManageReservationView(View):
+    def get(self, request):
+        reservations = Reservation.objects.filter(user=request.user)
+        return render(request, 'app/managereservation.html', {'reservations': reservations})
+
+@method_decorator(login_required,name='dispatch')
+class DeleteReservationView(View):
+    def get(self, request, reservation_id):
+        # Get the reservation object, or return 404 if not found
+        reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
+
+        # Check if the reservation belongs to the current user
+        if reservation.user == request.user:
+            # Get the current time and the reservation time
+            current_time = timezone.now()
+            reservation_datetime = timezone.datetime.combine(reservation.date, reservation.time)
+
+            # Make reservation_datetime timezone-aware
+            reservation_datetime = timezone.make_aware(reservation_datetime)
+
+            # Check if the reservation is at least 1 hour away
+            if reservation_datetime > current_time + timezone.timedelta(hours=1):
+                reservation.delete()
+                messages.success(request, "Reservation deleted successfully.")
+            else:
+                messages.error(request, "You cannot delete a reservation less than 1 hour before the scheduled time.")
+        else:
+            messages.error(request, "You are not authorized to delete this reservation.")
+
+        return redirect("manage_reservation")  # Redirect back to manage reservations page
+
+base_dir = 'C:\\Users\\SANIYA\\Downloads\\Rospl Project\\food'
+
+
+# Define the pickle directory
+pickle_dir = os.path.join(base_dir, 'pickle')
+
+# Load basic_dict.pkl
+basic_dict_path = os.path.join(pickle_dir, 'basic_dict.pkl')
+with open(basic_dict_path, 'rb') as file:
+    basic_dict_data = pickle.load(file)
+
+# Convert basic_dict_data to a DataFrame
+food = pd.DataFrame(basic_dict_data)
+
+# Load similarity1.pkl
+similarity1_path = os.path.join(pickle_dir, 'similarity1.pkl')
+with open(similarity1_path, 'rb') as file:
+    similarity1 = pickle.load(file)
+
+# Load similarity2.pkl
+similarity2_path = os.path.join(pickle_dir, 'similarity2.pkl')
+with open(similarity2_path, 'rb') as file:
+    similarity2 = pickle.load(file)
+
+
+def menu(request):
+    # Retrieve all products from the database
+    products = Product.objects.all()
+    
+    # Create a list to store zipped data
+    zipped_data = []
+    
+    # Iterate over each product and zip its attributes
+    for product in products:
+        zipped_data.append((product.food_name, product.food_category, product.Image, product.price, product.id))
+    
+    # Pass the zipped data to the template
+    context = {
+        'zipped_data': zipped_data,
+    }
+    
+    # Render the template with the data
+    return render(request, 'app/menu.html', context)

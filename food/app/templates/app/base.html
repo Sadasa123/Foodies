@@ -43,9 +43,11 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              {% comment %} {% if request.user.is_authenticated %} {% endcomment %}
+              {% if request.user.is_authenticated %}
+              
               <li class="nav-item"><a class="navbar-link active" style="font-weight:bold" aria-current="page" href="{% url 'home' %}">Home</a></li>
-              {% comment %} <li class="nav-item"><a class="navbar-link" style="font-weight:bold" href="{% url 'menu' %}">Menu</a></li> {% endcomment %}
+              <li class="nav-item"><a class="navbar-link" style="font-weight:bold" href="{% url 'menu' %}">Menu</a></li>
+              
               <li class="nav-item"><a class="navbar-link" style="font-weight:bold" href="{% url 'blog' %}">Blogs</a></li>
               <li class="nav-item"><a class="navbar-link" style="font-weight:bold" href="{% url 'about' %}">About us</a></li>
               <li class="nav-item"><a class="navbar-link" style="font-weight:bold" href="{% url 'contact' %}">Contact us</a></li>
@@ -64,25 +66,26 @@
               </a>
               <ul class="dropdown-menu" aria-labelledby="profileDropdown">
                 <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                {% comment %} <li><a class="dropdown-item" href="{% url 'passwordchange' %}">Change Password</a></li>
-                <li><a class="dropdown-item" href="{% url 'manage_reservation' %}">Manage Reservations</a></li> {% endcomment %}
-                {% comment %} <li><a class="dropdown-item" href="{% url 'showcart' %}">Cart</a></li>
+                <li><a class="dropdown-item" href="{% url 'passwordchange' %}">Change Password</a></li>
+                <li><a class="dropdown-item" href="{% url 'manage_reservation' %}">Manage Reservations</a></li>
+                {% comment %} <li><a class="dropdown-item" href="{% url 'showcart' %}">Cart</a></li> {% endcomment %}
                 <li><a class="dropdown-item" href="#">Wishlist</a></li>
-                <li><a class="dropdown-item" href="{% url 'orders' %}">My Orders</a></li> {% endcomment %}
+                {% comment %} <li><a class="dropdown-item" href="{% url 'orders' %}">My Orders</a></li> {% endcomment %}
+                
                 <li><hr class="dropdown-divider"></li>
                 <li>
-                  {% comment %} <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                   <form method="POST" action="{% url 'logout' %}" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit" class="dropdown-item">Logout</button>
-                  </form> {% endcomment %}
+                  </form> 
                 </li>
               </ul>
             </li>
-            {% comment %} <li class="nav-item mx-2"><a href="{% url 'reservation' %}" class="navbar-link"><button class="btn btn-hover">Reservation</button></a></li>
+            <li class="nav-item mx-2"><a href="{% url 'reservation' %}" class="navbar-link"><button class="btn btn-hover">Reservation</button></a></li>
             {% else %}
             <li class="nav-item mx-1"><a href="{% url 'login' %}" class="navbar-link" style="font-weight:bold; color: white;">Login</a></li>
             <li class="nav-item mx-1"><a href="{% url 'customerregistration' %}" class="navbar-link" style="font-weight:bold; color: white;">Register</a></li>
-            {% endif %} {% endcomment %}
+            {% endif %} 
           </ul>
         </div>
       </nav>
