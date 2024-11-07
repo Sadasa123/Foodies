@@ -145,6 +145,30 @@ def feedback(request):
         return redirect("/")
     return render(request, 'app/feedback.html',locals())
 
+@method_decorator(login_required,name='dispatch')
+class ProductDetail(View):
+     def get(self, request, pk):
+        try:
+            # Fetch the product from the database using the provided primary key (pk)
+            product = Product.objects.get(id=pk)
+            
+            # Get recommendations for the current product
+            recommendations = recommend(product.food_name)
+            
+            # Get same category recommendations for the current product
+            same_category_recommendations = same_recommend1(product.food_name)
+
+            context = {
+                'product': product,
+                #'wishlist': wishlist,
+                'recommendations': recommendations,
+                'same_category_recommendations': same_category_recommendations,
+            }
+            return render(request, 'app/productdetail.html', context)
+        except Product.DoesNotExist:
+            # Handle the case where the product with the given primary key doesn't exist
+            return HttpResponseNotFound("The requested product does not exist.")
+
 @login_required   
 def create_blog(request):
     if request.method == 'POST':
@@ -233,8 +257,195 @@ class DeleteReservationView(View):
 
         return redirect("manage_reservation")  # Redirect back to manage reservations page
 
-base_dir = 'C:\\Users\\SANIYA\\Downloads\\Rospl Project\\food'
+@login_required   
+def add_to_cart(request):
+    user = request.user
+    product_id = request.GET.get("prod_id")
+    product = Product.objects.get(id=product_id)
+    
+    # Check if the product is already in the cart for the current user
+    existing_cart_item = Cart.objects.filter(user=user, product=product).first()
+    if existing_cart_item:
+        # If the product already exists in the cart, increase the quantity by 1
+        existing_cart_item.quantity = F('quantity') + 1
+        existing_cart_item.save()
+        # messages.success(request, "Quantity updated successfully.")
+    else:
+        # If the product is not in the cart, add it to the cart with quantity 1
+        Cart.objects.create(user=user, product=product)
+        # messages.success(request, "Product added to cart successfully.")
+    
+    return redirect("/cart")
 
+@login_required
+def show_cart(request):
+    user = request.user
+    cart_items = Cart.objects.filter(user=user)
+    
+    total_amount = 0
+    for cart_item in cart_items:
+        value = cart_item.quantity * cart_item.product.price
+        total_amount += value    
+    return render(request, 'app/addtocart.html', {'cart_items': cart_items, 'total_amount': total_amount})
+
+@login_required
+def plus_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET.get('prod_id')
+        product = get_object_or_404(Product, id=prod_id)
+        cart_item, created = Cart.objects.get_or_create(product=product, user=request.user)
+        cart_item.quantity += 1
+        cart_item.save()
+        cart = Cart.objects.filter(user=request.user)
+        amount = sum(p.quantity * p.product.price for p in cart)
+        totalamount = amount
+
+        data = {
+            'quantity': cart_item.quantity,
+            'amount': amount,
+            'totalamount': totalamount
+        }
+        return JsonResponse(data)
+
+@login_required
+def minus_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET.get('prod_id')
+        product = get_object_or_404(Product, id=int(prod_id))
+        cart_item = get_object_or_404(Cart, product=product, user=request.user)
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        cart = Cart.objects.filter(user=request.user)
+        amount = sum(p.quantity * p.product.price for p in cart)
+        totalamount = amount
+
+        data = {
+            'quantity': cart_item.quantity,
+            'amount': amount,
+            'totalamount': totalamount
+        }
+        return JsonResponse(data)
+
+@login_required
+def remove_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET.get('prod_id')
+        
+        # Use get_object_or_404 to retrieve the cart item
+        cart_item = get_object_or_404(Cart, product_id=prod_id, user=request.user)
+        # Delete the cart item
+        cart_item.delete()
+
+        # Recalculate the amount and total amount after removing the item
+        user = request.user
+        cart = Cart.objects.filter(user=user)
+        amount = sum(p.quantity * p.product.price for p in cart)
+        totalamount = amount 
+
+        # Prepare data to send back in the JSON response
+        data = {
+            'amount': amount,
+            'totalamount': totalamount
+        }
+        return JsonResponse(data)
+
+@method_decorator(login_required,name='dispatch')   
+class checkout(View):
+    def get(self,request):
+        user=request.user
+        add=Customer.objects.filter(user=user)
+        cart_items=Cart.objects.filter(user=user)
+        famount = 0
+        for p in cart_items:
+            value=p.quantity * p.product.price
+            famount = famount + value
+        totalamount = famount 
+        razoramount = int(totalamount * 100)
+        client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+        data = {"amount" :razoramount, "currency":"INR","receipt":"order_rcptid_12"}
+        payment_response = client.order.create(data=data)
+        print(payment_response)
+        order_id = payment_response['id']
+        order_status = payment_response['status']
+        if order_status == 'created':
+            payment = Payment(
+                user=user,
+                amount=totalamount,
+                razorpay_order_id = order_id,
+                razorpay_payment_status = order_status
+            )
+            payment.save()
+        return render(request, 'app/checkout.html',locals())
+
+@login_required
+def payment_done(request):
+    order_id = request.GET.get('order_id')
+    payment_id = request.GET.get('payment_id')
+    cust_id = request.GET.get('cust_id')
+    
+    # Log received parameters for debugging
+    print(f"Received payment details: order_id={order_id}, payment_id={payment_id}, cust_id={cust_id}")
+
+    # Signature Verification
+    signature = request.GET.get('razorpay_signature')
+    generated_signature = hmac.new(
+        bytes(settings.RAZOR_KEY_SECRET, 'utf-8'),
+        msg=(order_id + "|" + payment_id).encode('utf-8'),
+        digestmod=hashlib.sha256
+    ).hexdigest()
+
+    if generated_signature == signature:
+        try:
+            # Retrieve payment record
+            payment = Payment.objects.get(razorpay_order_id=order_id)
+
+            # Update payment status and payment ID
+            payment.paid = True
+            payment.razorpay_payment_id = payment_id
+            payment.save()
+
+            # Get customer information
+            customer = Customer.objects.get(id=cust_id)
+            user = request.user
+
+            # Save order details
+            cart_items = Cart.objects.filter(user=user)
+            for item in cart_items:
+                OrderPlaced.objects.create(
+                    user=user,
+                    customer=customer,
+                    product=item.product,
+                    quantity=item.quantity,
+                    payment=payment
+                )
+                item.delete()  # Remove item from cart after placing the order
+
+            print("Payment processed successfully, orders placed in the database.")
+            return redirect("orders")  # Redirect to orders page on success
+        except Payment.DoesNotExist:
+            print(f"No payment found with order_id: {order_id}")
+            return redirect("checkout")  # Handle case where payment record does not exist
+        except Customer.DoesNotExist:
+            print(f"No customer found with id: {cust_id}")
+            return redirect("checkout")  # Handle case where customer record does not exist
+    else:
+        print("Signature verification failed.")
+        # Handle verification failure
+        return redirect("checkout")
+
+@login_required
+def orders(request):
+    order_placed=OrderPlaced.objects.filter(user=request.user)
+    return render(request, 'app/orders.html',locals())
+
+def delete_order(request, order_id):
+    order = get_object_or_404(OrderPlaced, id=order_id, user=request.user)
+    order.delete()
+    messages.success(request, 'Order deleted successfully.')
+    return redirect('orders') 
+
+base_dir = 'C:\\Users\\SANIYA\\Downloads\\Rospl Project\\food'
 
 # Define the pickle directory
 pickle_dir = os.path.join(base_dir, 'pickle')
@@ -276,3 +487,106 @@ def menu(request):
     
     # Render the template with the data
     return render(request, 'app/menu.html', context)
+
+def recommended_ui(request):
+    return render(request, 'app/recommend.html')
+
+
+def recommend_foods(request):
+    if request.method == 'POST':
+        # Get the user input from the form
+        user_input = request.POST.get('user_input')
+
+        # Recommendation code
+        try:
+            food_obj = Product.objects.get(food_name=user_input)
+            food_index = food_obj.id  # Assuming the IDs are sequential starting from 1
+            distances = similarity1[food_index]
+            foods_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])[1:6]
+
+            recommendations = []
+            for i in foods_list:
+                recommended_food = Product.objects.get(pk=i[0] + 1)  # Assuming primary keys are sequential starting from 1
+                recommendations.append({
+                    "pk": recommended_food.pk,  # Add the primary key here
+                    "food_name": recommended_food.food_name,
+                    "image_title": recommended_food.Image,
+                    "food_category": recommended_food.food_category,
+                    "price": recommended_food.price
+                })
+
+            same_category_recommendations = get_same_category_foods(user_input)
+
+            return render(request, 'app/recommend.html', {
+                'recommendations': recommendations,
+                'same_category_recommendations': same_category_recommendations,
+                'user_input': user_input
+            })
+        except Product.DoesNotExist:
+            return HttpResponseNotFound("The requested item is currently not available.")
+
+
+def get_same_category_foods(user_input):
+    try:
+        food_obj = Product.objects.get(food_name=user_input)
+        sub_category = food_obj.sub_category
+        same_category_foods = Product.objects.filter(sub_category=sub_category).exclude(food_name=user_input)[:9]
+
+        same_category_recommendations = []
+        for recommended_food in same_category_foods:
+            same_category_recommendations.append({
+                "pk": recommended_food.pk,  # Add the primary key here
+                "food_name": recommended_food.food_name,
+                "image_title": recommended_food.Image,
+                "sub_category": recommended_food.sub_category,
+                "price": recommended_food.price
+            })
+
+        return same_category_recommendations
+    except Product.DoesNotExist:
+        return []
+
+
+def recommend(food):
+    try:
+        product = Product.objects.get(food_name=food)
+        food_index = product.id - 1
+        distances = similarity1[food_index]
+        foods_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])[1:7]
+
+        recommendations = []
+        for i in foods_list:
+            similar_product = Product.objects.get(pk=i[0] + 1)
+            recommendations.append({
+                "pk": similar_product.pk,
+                "food_name": similar_product.food_name,
+                "image_title": similar_product.Image,
+                "food_category": similar_product.food_category,
+                "price": similar_product.price,
+            })
+
+        return recommendations
+    except Product.DoesNotExist:
+        return []
+
+
+def same_recommend1(food):
+    try:
+        product = Product.objects.get(food_name=food)
+        # food_index = product.id - 1
+        sub_category = product.sub_category
+        same_category_foods = Product.objects.filter(sub_category=sub_category).exclude(food_name=food)[:6]
+
+        recommendations = []
+        for recommended_food in same_category_foods:
+            recommendations.append({
+                "pk": recommended_food.pk,
+                "food_name": recommended_food.food_name,
+                "image_title": recommended_food.Image,
+                "sub_category": recommended_food.sub_category,
+                "price": recommended_food.price,
+            })
+
+        return recommendations
+    except Product.DoesNotExist:
+        return []
