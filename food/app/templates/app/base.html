@@ -44,7 +44,6 @@
           <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               {% if request.user.is_authenticated %}
-              
               <li class="nav-item"><a class="navbar-link active" style="font-weight:bold" aria-current="page" href="{% url 'home' %}">Home</a></li>
               <li class="nav-item"><a class="navbar-link" style="font-weight:bold" href="{% url 'menu' %}">Menu</a></li>
               
@@ -83,8 +82,8 @@
             </li>
             <li class="nav-item mx-2"><a href="{% url 'reservation' %}" class="navbar-link"><button class="btn btn-hover">Reservation</button></a></li>
             {% else %}
-            <li class="nav-item mx-1"><a href="{% url 'login' %}" class="navbar-link" style="font-weight:bold; color: white;">Login</a></li>
-            <li class="nav-item mx-1"><a href="{% url 'customerregistration' %}" class="navbar-link" style="font-weight:bold; color: white;">Register</a></li>
+            <li class="nav-item mx-1"><a href="{% url 'registration' %}" class="navbar-link" style="font-weight:bold; color: white;">Register</a></li>
+            <li class="nav-item mx-1"><a href="{% url 'login' %}" class="navbar-link" style="font-weight:bold; color: white;">Login</a></li>   
             {% endif %} 
           </ul>
         </div>

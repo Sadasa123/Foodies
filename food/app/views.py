@@ -210,8 +210,7 @@ class reservation_view(View):
         else:
             messages.warning(request, "Invalid Input Data")
         return render(request, 'app/reservation_form.html', {'form': form})
-
-@method_decorator(login_required,name='dispatch')       
+       
 class CustomerRegistrationView(View):
     def get(self,request):
         form = CustomerRegistrationForm()
@@ -470,8 +469,14 @@ with open(similarity2_path, 'rb') as file:
 
 
 def menu(request):
-    # Retrieve all products from the database
-    products = Product.objects.all()
+    # Get the 'food_category' from the URL query parameters (e.g., "breakfast")
+    food_category = request.GET.get('food_category')
+    
+    # Filter products based on the 'food_category' if it exists, otherwise retrieve all products
+    if food_category:
+        products = Product.objects.filter(food_category=food_category)
+    else:
+        products = Product.objects.all()
     
     # Create a list to store zipped data
     zipped_data = []
